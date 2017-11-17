@@ -9,8 +9,8 @@ public class Complex {
 	
 	public Complex(double radius, double angle, boolean polar)
 	{
-			real = radius * Math.cos(angle);
-			imaginary = radius * Math.sin(angle);
+		real = radius * Math.cos(angle);
+		imaginary = radius * Math.sin(angle);
 	}
 
 	public Complex(double re, double im)
@@ -22,6 +22,12 @@ public class Complex {
 	public Complex(String z)
 	{
 		//parse complex number. Currently fixed by adding 2 complex numbers
+	}
+	
+	public Complex(double re)
+	{
+		real = re;
+		imaginary = 0;
 	}
 	
 	public Complex()
@@ -41,11 +47,13 @@ public class Complex {
 			else
 				re = fmt.format(real);
 		}
-		else re = "0";
+		else {
+			re = "0";
+		}
 		if (imaginary != 0) {
 			if (imaginary == 1) im = "i";
 			else if (imaginary == -1) im = "-i";
-			else if (Math.floor(imaginary) == imaginary) im = String.valueOf((int)imaginary + 'i');
+			else if (Math.floor(imaginary) == imaginary) im = String.valueOf((int)imaginary) + 'i';
 			else im = fmt.format(imaginary) + 'i';
 		}
 		else im = "0i";

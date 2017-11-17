@@ -2,7 +2,7 @@ package calculator;
 
 import java.util.Arrays;
 
-import calculator.Caclulator.Style;
+import calculator.Calculator.Style;
 
 public class ComplexExpression extends Expression
 {
@@ -71,7 +71,7 @@ public class ComplexExpression extends Expression
 			else if (isOperator(ascii)) {//set an operator waiting
 				if (!number) {//operators at the start are ignored
 					if (ascii == '-') {//except the - operator
-						memory[pointer] = new Complex(0,0);
+						memory[pointer] = new Complex();
 						pointer++;
 						operatortype = '-';
 						operator = number = true;
@@ -85,7 +85,7 @@ public class ComplexExpression extends Expression
 				else if (ascii == '-') {//except the - operator, which can change the existing operator
 					switch (operatortype) {
 					case '+': operatortype = '-'; break;
-					case '*': case '/': case ':': case '÷': doMath(memory[pointer-1], new Complex(-1, 0), '*');
+					case '*': case '/': case ':': case '÷': memory[pointer-1] = doMath(memory[pointer-1], new Complex(-1), '*');
 					}
 				}
 			}
@@ -114,8 +114,8 @@ public class ComplexExpression extends Expression
 			}
 			else if (ascii == 101 || ascii == 960) {
 				switch (ascii) {
-				case 101: memory[pointer] = new Complex(Math.E, 0); break;
-				case 960: memory[pointer] = new Complex(Math.PI, 0); break;
+				case 101: memory[pointer] = new Complex(Math.E); break;
+				case 960: memory[pointer] = new Complex(Math.PI); break;
 				default:
 				}
 				if (singularoperator) {
@@ -141,7 +141,7 @@ public class ComplexExpression extends Expression
 	
 	protected Complex doMath(Complex s, Complex a, char ch) 
 	{
-		Complex z = new Complex(0,0);
+		Complex z = new Complex();
 		switch (ch) {
 		case '+':
 			z.real = a.real + s.real;
@@ -164,7 +164,7 @@ public class ComplexExpression extends Expression
 			double radius =  Math.pow(s.abs(), a.real);
 			double angle = s.angle()*a.real;
 			Complex za = new Complex(radius, angle, true);
-			double b = Math.log(s.real) * a.imaginary;
+			double b = Math.log(s.abs()) * a.imaginary;
 			Complex zb = new Complex(1, b, true);
 			z = doMath(za, zb, '*');
 			break;
@@ -181,7 +181,7 @@ public class ComplexExpression extends Expression
 			double radius = s.abs();
 			double angle = s.angle() / 2;
 			radius = Math.sqrt(radius);
-			z = new Complex(radius * Math.cos(angle), radius * Math.sin(angle));
+			z = new Complex(radius, angle, true);
 			break;
 		case 13265:
 			z.real = Math.log(s.real);
@@ -199,15 +199,16 @@ public class ComplexExpression extends Expression
 	
 	private Complex parseComplex(String r) throws NumberFormatException 
 	{
-		Complex z;
+		Complex z = new Complex();
 		if (r.charAt(r.length()-1) == 'i') {
-			if (r.length()>1)
-				z = new Complex(0,Double.parseDouble(r.substring(0,r.length()-1)));
+			if (r.length()>1) {
+				z.imaginary = Double.parseDouble(r.substring(0,r.length()-1));
+			}
 			else
-				z = new Complex(0,1);
+				z.imaginary = 1;
 		}
 		else {
-			z = new Complex(Double.parseDouble(r), 0);
+			z.real = Double.parseDouble(r);
 		}
 		return z;
 	}
