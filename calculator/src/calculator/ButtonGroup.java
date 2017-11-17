@@ -16,6 +16,7 @@ public class ButtonGroup
 	private TextField outputField;
 	private GridPane grid;
 	private int size = 0;
+	private Button placeHolder = new Button();
 	
 	public ButtonGroup(char[] text, GridPane pane, TextField output)
 	{
@@ -27,22 +28,23 @@ public class ButtonGroup
 	
 	public void addButton(Button btn, int column, int row)
 	{
-		btn.setOnAction(buttonClicked);
-		grid.getChildren().remove(column, row);
+		if (btn.getOnAction() == null)
+			btn.setOnAction(buttonClicked);
+		grid.getChildren().remove(placeHolder);
 		grid.add(btn, column, row);
-		size++;
 	}
 	
 	public void addButton(Button btn)
 	{
-		btn.setOnAction(buttonClicked);
+		if (btn.getOnAction() == null)
+			btn.setOnAction(buttonClicked);
 		grid.add(btn, size % cols, size / cols);
 		size++;
 	}
 	
-	public void setRows(int rows)
+	public void setRows(int cols)
 	{
-		this.cols = rows;
+		this.cols = cols;
 	}
 	
 	public void setWidth(double width)
@@ -53,10 +55,15 @@ public class ButtonGroup
 	public void generateButtons()
 	{
 		for (int i = size; i < buttons.length + size; i++) {
-			buttons[i] = new Button(String.valueOf(text[i]));
-			buttons[i].setOnAction(buttonClicked);
-			buttons[i].setPrefWidth(prefWidth);
-			grid.add(buttons[i], i % cols, i / cols);			
+			if (text[i] == 'x') {
+				buttons[i] = placeHolder;
+			}
+			else {
+				buttons[i] = new Button(String.valueOf(text[i]));
+				buttons[i].setOnAction(buttonClicked);
+				buttons[i].setPrefWidth(prefWidth);
+				grid.add(buttons[i], i % cols, i / cols);
+			}
 		}
 		size += buttons.length;
 	}

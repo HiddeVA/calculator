@@ -4,7 +4,7 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Arrays;
 
-import calculator.Caclulator.Style;
+import calculator.Calculator.Style;
 
 public class Expression
 {
@@ -15,6 +15,8 @@ public class Expression
 	protected char m_delimiter;
 	
 	public Expression(String expression, char[] numberSet) {
+		if (expression == null || numberSet == null) {m_expression = ""; m_numberSet = new char[] {};}
+		else {
 		m_expression = expression;
 		m_numberSet = numberSet;
 		if (Arrays.binarySearch(numberSet, '1') >= 0) {
@@ -24,9 +26,12 @@ public class Expression
 		else {
 			m_style = Style.ROMAN;
 		}
-	}
+	}}
 	
-	public Expression() {} //for testing purposes
+	public Expression()
+	{
+		m_expression = ""; m_numberSet = new char[] {};
+	} //for testing purposes
 	
 	public String getResult()
 	{
@@ -187,7 +192,7 @@ public class Expression
 			else if (isSingularOperator(ascii)) {
 				singularoperator = true;
 				xoperatortype = ascii;
-			}			
+			}		
 		}
 		return memory[0];
 	}
@@ -231,8 +236,10 @@ public class Expression
 		switch (z) {
 		case 8730:
 			x = Math.sqrt(x);
+			break;
 		case 13265:
 			x = Math.log(x);
+			break;
 		default:
 		}
 		return x;
@@ -282,7 +289,7 @@ public class Expression
 		int result = 0;
 		int reader = 0;
 		int z = 0;
-		r += " ";
+		r += " "; //to avoid errors trying to read 2 characters at the end of a number
 		String[] romanNumbers = {"M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I"};
 		int[] romanValues = {1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1};
 		
@@ -303,10 +310,11 @@ public class Expression
 			else {
 				z++;
 				if (z == 3) {
-					z = 0; reader++;
+					z = 0;
+					reader++;
 				}
 			}
-			if (reader > 12 && i < r.length() - 1)
+			if (reader > 12 && i < r.length() - 2)
 				return 0;
 		}
 		return result;
