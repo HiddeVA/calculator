@@ -23,7 +23,7 @@ public class ComplexExpression extends Expression
 	
 	public void evaluate()
 	{
-		m_result = cevaluate(checkBrackets(m_expression));
+		m_result = cevaluate(fixOrderOfOperations(checkBrackets(m_expression)));
 	}
 	
 	private Complex cevaluate(String expression)
@@ -160,13 +160,21 @@ public class ComplexExpression extends Expression
 			z.imaginary = (s.imaginary * a.real - s.real * a.imaginary) / (a.real * a.real + a.imaginary * a.imaginary);
 			break;
 		case '^':
-			//TODO: Results are correct if either imaginary part is 0 or real part is 0.
 			double radius =  Math.pow(s.abs(), a.real);
 			double angle = s.angle()*a.real;
 			Complex za = new Complex(radius, angle, true);
-			double b = Math.log(s.abs()) * a.imaginary;
-			Complex zb = new Complex(1, b, true);
+			Complex zb;
+			if (a.real == 0) 
+				zb = new Complex(1, Math.log(s.abs()) * a.imaginary, true);
+			else if (a.imaginary == 0)
+				zb = new Complex(1, 0);
+			else
+				zb = new Complex(Math.exp(a.angle()*-1), Math.log(s.abs()) ,true);
 			z = doMath(za, zb, '*');
+			//This is one of those cases of "it works, but I don't really know why". Please don't do too much complex exponentiation.
+			break;
+		case 13266:
+			z = doMath(doMath(a, (char)13265), doMath(s, (char)13265), '/');
 			break;
 		default:
 		}
@@ -175,17 +183,22 @@ public class ComplexExpression extends Expression
 	
 	protected Complex doMath(Complex s, char ch)
 	{
-		Complex z = new Complex();
+		Complex z;
+		double radius = s.abs();
+		double angle = s.angle();
 		switch (ch) {
 		case 8730:
-			double radius = s.abs();
-			double angle = s.angle() / 2;
+			angle /= 2;
 			radius = Math.sqrt(radius);
 			z = new Complex(radius, angle, true);
 			break;
 		case 13265:
-			z.real = Math.log(s.real);
+			radius = s.abs();
+			angle = s.angle();
+			z = new Complex(Math.log(radius), angle);
+			break;
 		default:
+			z = new Complex();
 		}
 		return z;
 	}

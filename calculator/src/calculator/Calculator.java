@@ -16,11 +16,11 @@ public class Calculator extends Application {
 	TextField txtInput;
 	Label lblAnswer;
 	char decimalDelimiter = '.';
-	public enum Style {STANDARD, ROMAN, LITERAL, COMPLEX}
+	public enum Style {STANDARD, ROMAN, COMPLEX, EQUATION}
 	Style numberFormat = Style.STANDARD;
 	char[] allowedCharSet = {33, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55,
-			56, 57, 58, 67, 68, 69, 73, 76, 77, 86, 88, 91, 93, 94, 101, 105, 123, 125, 215,
-			246, 960, 8730, 13265, 13266};
+			56, 57, 58, 67, 68, 69, 73, 76, 77, 86, 88, 91, 93, 94, 97, 99, 101, 103, 105, 108,
+			110, 111, 115, 116, 123, 125, 215, 246, 960, 8730, 13265, 13266};
 	//these are unicode characters. To find what they represent check out http://www.asciitable.com/ or https://unicode-table.com/
 	char[] numberSet = {decimalDelimiter, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 69};
 	Button btnDelim;
@@ -28,11 +28,11 @@ public class Calculator extends Application {
 	@Override public void start(Stage stage) {
 		//---------------------------------
 		//Index:				Line:
-		//#1 Basic Layout		36
-		//#2 Basic Controls		55
-		//#3 Button Inputs		73
-		//#4 Settings Tab		111
-		//#5 Final Statements	168
+		//#1 Basic Layout		38
+		//#2 Basic Controls		57
+		//#3 Button Inputs		77
+		//#4 Settings Tab		134
+		//#5 Final Statements	200
 		//----------------------------------
 		
 		//#1 Basic Layout
@@ -58,6 +58,9 @@ public class Calculator extends Application {
 		txtInput = new TextField();
 		txtInput.setPrefWidth(200);
 		txtInput.setMaxWidth(250);
+		lblAnswer = new Label();
+		lblAnswer.setPrefWidth(200);
+		lblAnswer.setMaxWidth(300);
 		HBox hboxCalculate = new HBox();
 		Button btnCalculate = new Button("Calculate");
 		btnCalculate.setOnAction(e->calculate());
@@ -65,12 +68,11 @@ public class Calculator extends Application {
 		btnClear.setOnAction(e->{txtInput.clear();lblAnswer.setText("");});
 		Button btnUndo = new Button("Backspace");
 		btnUndo.setOnAction(e->{txtInput.undo();txtInput.undo();});
+		Button btnCopy = new Button("Copy");
+		btnCopy.setOnAction(e->{txtInput.setText(lblAnswer.getText().substring(8));});
 		hboxCalculate.setSpacing(10);
-		hboxCalculate.getChildren().addAll(btnCalculate, btnClear, btnUndo);
+		hboxCalculate.getChildren().addAll(btnCalculate, btnCopy, btnClear, btnUndo);
 		hboxCalculate.setAlignment(Pos.CENTER);
-		lblAnswer = new Label();
-		lblAnswer.setPrefWidth(200);
-		lblAnswer.setMaxWidth(300);
 		
 		//#3 Button Inputs
 		HBox controls = new HBox();
@@ -108,10 +110,26 @@ public class Calculator extends Application {
 		btnExp.setPrefWidth(33);
 		btnExp.setOnAction(e->{txtInput.appendText("e^(");});
 		advancedOperatorButtons.addButton(btnExp, 1, 2);
+		advancedOperatorButtons.setRows(3);
+		Button btnSin = new Button("sin");
+		btnSin.setPrefWidth(35);
+		btnSin.setOnAction(e->{txtInput.appendText("sin");});
+		Button btnCos = new Button("cos");
+		btnCos.setPrefWidth(35);
+		btnCos.setOnAction(e->{txtInput.appendText("cos");});
+		Button btnTan = new Button("tan");
+		btnTan.setPrefWidth(35);
+		btnTan.setOnAction(e->{txtInput.appendText("tan");});
+		advancedOperatorButtons.addButton(btnSin, 2, 0);
+		advancedOperatorButtons.addButton(btnCos, 2, 1);
+		advancedOperatorButtons.addButton(btnTan, 2, 2);
 		
 		Button btnIi = new Button("i");
 		btnIi.setPrefWidth(25);
 		btnIi.setOnAction(e->{txtInput.appendText("i");});
+		Button btnXx = new Button("a");
+		btnXx.setPrefWidth(25);
+		btnXx.setOnAction(e->{txtInput.appendText("a");});
 		
 		//#4 Settings Tab
 		RadioButton rbtComma = new RadioButton();
@@ -136,7 +154,7 @@ public class Calculator extends Application {
 		rbtStandard.setOnAction(e->{
 			controls.getChildren().remove(romanNumberPane);
 			if (!(controls.getChildren().contains(numberPane))) controls.getChildren().add(0, numberPane);
-			numberPane.getChildren().remove(btnIi);
+			numberPane.getChildren().removeAll(btnIi, btnXx);
 			numberSet = new char[]{decimalDelimiter, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57};
 			numberFormat = Style.STANDARD;
 		});
@@ -144,17 +162,26 @@ public class Calculator extends Application {
 		rbtComplex.setOnAction(e->{
 			controls.getChildren().remove(romanNumberPane);
 			if (!(controls.getChildren().contains(numberPane))) controls.getChildren().add(0, numberPane);
-			if (!(numberPane.getChildren().contains(btnIi))) numberPane.add(btnIi, 2, 3);
+			if (!(numberPane.getChildren().contains(btnIi))) {numberPane.getChildren().remove(btnXx); numberPane.add(btnIi, 2, 3);}
 			numberSet = new char[] {decimalDelimiter, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 105};
 			numberFormat = Style.COMPLEX;
 		});
+		RadioButton rbtEquation = new RadioButton();
+		rbtEquation.setOnAction(e->{
+			controls.getChildren().remove(romanNumberPane);
+			if (!(controls.getChildren().contains(numberPane))) controls.getChildren().add(0, numberPane);
+			if (!(numberPane.getChildren().contains(btnXx))) {numberPane.getChildren().remove(btnIi); numberPane.add(btnXx, 2, 3);}
+			numberSet = new char[] {decimalDelimiter, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 97};
+			numberFormat = Style.EQUATION;
+		});
 		rbtStandard.setSelected(true);
 		ToggleGroup roman = new ToggleGroup();
-		roman.getToggles().addAll(rbtRoman, rbtStandard, rbtComplex);
+		roman.getToggles().addAll(rbtRoman, rbtStandard, rbtComplex, rbtEquation);
 		HBox hboxRoman = new HBox(rbtRoman, new Label("Roman"));
 		HBox hboxStandard = new HBox(rbtStandard, new Label("Standard"));
 		HBox hboxComplex = new HBox(rbtComplex, new Label("Complex"));
-		VBox romanSettings = new VBox(new Label("Number Format:"), hboxRoman, hboxStandard, hboxComplex);
+		HBox hboxEquation = new HBox(rbtEquation, new Label("Equation"));
+		VBox numberSettings = new VBox(new Label("Number Format:"), hboxRoman, hboxStandard, hboxComplex, hboxEquation);
 		
 		RadioButton rbtSimple = new RadioButton();
 		rbtSimple.setOnAction(e->{controls.getChildren().remove(advancedOperators);});
@@ -167,7 +194,7 @@ public class Calculator extends Application {
 		HBox hboxAdvanced = new HBox(rbtAdvanced, new Label("Advanced"));
 		VBox modeSettings = new VBox(new Label("Mode:"), hboxSimple, hboxAdvanced);
 		
-		settingsGrid.getChildren().addAll(decimalSettings, romanSettings, modeSettings);
+		settingsGrid.getChildren().addAll(decimalSettings, numberSettings, modeSettings);
 		settingsGrid.setSpacing(30);
 		
 		//#5 Final Statements
@@ -190,7 +217,10 @@ public class Calculator extends Application {
 			expression = new Expression(input, numberSet);
 			break;
 		case COMPLEX:
-			expression = new ComplexExpression(input, numberSet);	
+			expression = new ComplexExpression(input, numberSet);
+			break;
+		case EQUATION:
+			expression = new Equation(input, numberSet);
 			break;
 		default:
 			expression = new Expression();
@@ -206,8 +236,23 @@ public class Calculator extends Application {
 	{
 		if (str.length() == 0) return "";
 		for (int i=0; i < str.length(); i++) {
-			if (isClutter(str.charAt(i)))
+			if (isClutter(str.charAt(i))) {
 				return str.substring(0, i) + removeClutter(str.substring(i+1));
+			}
+			else if (Arrays.binarySearch(new char[] {'c', 'l', 's', 't'},str.charAt(i)) >= 0) {
+				try {
+					String scs = str.substring(i, i+3);
+					switch (scs) {
+					case "cos": return str.substring(0, i) + "Ç" + removeClutter(str.substring(i+3));
+					case "sin": return str.substring(0, i) + "é" + removeClutter(str.substring(i+1));
+					case "tan": return str.substring(0, i) + "â" + removeClutter(str.substring(i+1));
+					case "log": return str.substring(0, i) + "㏒" + removeClutter(str.substring(i+1));
+					}
+				}
+				catch (StringIndexOutOfBoundsException stre) {
+					
+				}
+			}
 		}
 		return str;
 	}
