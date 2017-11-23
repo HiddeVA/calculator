@@ -6,6 +6,10 @@ import java.util.Arrays;
 
 import calculator.Calculator.Style;
 
+//Other Expansions:
+//Make the calculator handle equations like 2*(a + 1) = 2a + 2
+//Allow the calculator to handle trigonometry and other operations for which there is no unicode symbol
+
 public class Expression
 {
 	protected String m_expression;
@@ -14,19 +18,25 @@ public class Expression
 	protected Style m_style;
 	protected char m_delimiter;
 	
-	public Expression(String expression, char[] numberSet) {
-		if (expression == null || numberSet == null) {m_expression = ""; m_numberSet = new char[] {};}
-		else {
-		m_expression = expression;
-		m_numberSet = numberSet;
-		if (Arrays.binarySearch(numberSet, '1') >= 0) {
-			m_style = Style.STANDARD;
-			m_delimiter = numberSet[0];
+	public Expression(String expression, char[] numberSet)
+	{
+		if (expression == null || numberSet == null) {
+			m_expression = "";
+			m_numberSet = new char[] {};
 		}
-		else {
-			m_style = Style.ROMAN;
+		else
+		{
+			m_expression = expression;
+			m_numberSet = numberSet;
+			if (Arrays.binarySearch(numberSet, '1') >= 0) {
+				m_style = Style.STANDARD;
+				m_delimiter = numberSet[0];
+			}
+			else {
+				m_style = Style.ROMAN;
+			}
 		}
-	}}
+	}
 	
 	public Expression()
 	{
@@ -67,9 +77,46 @@ public class Expression
 		return output + closingBrackets;
 	}
 	
+	protected String orderOfOperations(String input, char[] higherSet, char[] lowerSet)
+	{
+		String output = input;
+		for (int i = 0; i < output.length(); i++) {
+			if (Arrays.binarySearch(higherSet, output.charAt(i)) >= 0) {
+				for (int j = i - 1; j > 0; j--) {
+					if (isOpeningBracket(output.charAt(j))) {break;}
+					if (isClosingBracket(output.charAt(j))) {
+						j = findOpeningBracket(output, j);
+						if (j < 0) break;
+					}
+					if (Arrays.binarySearch(lowerSet, output.charAt(j)) >= 0) {
+						int k = i + 1;
+						while (isNumeric(output.charAt(k))) {
+							k++;
+							if (k >= output.length()) break;
+						}
+						if (k < output.length())
+							output = output.substring(0,j+1) + "(" + output.substring(j+1,k) + ")" + output.substring(k);
+						else
+							output = output.substring(0,j+1) + "(" + output.substring(j+1) + ")";
+						i++;
+						break;
+					}
+				}				
+			}
+		}
+		return output;
+	}
+	
+	protected String fixOrderOfOperations(String input) 
+	{
+		return orderOfOperations(
+				orderOfOperations(input, new char[]{'^', 13266}, new char[]{'*', '+', '-' , '/', ':', '^', '÷'}), 
+				new char[]{'*', '/', ':', '÷'}, new char[] {'+', '-'});
+	}
+	
 	public void evaluate()
 	{
-		m_result = evaluate(checkBrackets(m_expression));
+		m_result = evaluate(fixOrderOfOperations(checkBrackets(m_expression)));
 	}
 	
 	private double evaluate(String expression)
@@ -234,12 +281,11 @@ public class Expression
 	
 	private double doMath(double x, char z) {
 		switch (z) {
-		case 8730:
-			x = Math.sqrt(x);
-			break;
-		case 13265:
-			x = Math.log(x);
-			break;
+		case 'Ç': return Math.cos(x);
+		case 'é': return Math.sin(x);
+		case 'â': return Math.tan(x);
+		case 8730: return Math.sqrt(x);
+		case 13265: return Math.log(x);
 		default:
 		}
 		return x;
@@ -260,6 +306,21 @@ public class Expression
 		return -1;
 	}
 	
+	protected int findOpeningBracket(String expression, int start) {
+		int depth = 0;
+		for (int x = start - 1; x > 0; x--) {
+			if (isOpeningBracket(expression.charAt(x))) {
+				if (depth == 0)
+					return x;
+				else
+					depth--;
+			}
+			if (isClosingBracket(expression.charAt(x)))
+				depth++;
+		}
+		return -1;
+	}
+	
 	protected boolean isNumeric(char ch)
 	{
 		return (Arrays.binarySearch(m_numberSet, ch) >= 0);
@@ -272,7 +333,7 @@ public class Expression
 	
 	protected boolean isSingularOperator(char ch)
 	{
-		return ch == '√' || ch == 13265;
+		return ch == 'Ç' || ch == 'é' || ch == 'â'|| ch == '√' || ch == 13265;
 	}
 	
 	protected boolean isOpeningBracket(char ch)

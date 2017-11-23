@@ -21,7 +21,21 @@ public class Complex {
 	
 	public Complex(String z)
 	{
-		//parse complex number. Currently fixed by adding 2 complex numbers
+		int separator = z.indexOf("+");
+		if (separator < 0) {
+			if (z.charAt(z.length()-1) == 'i') {
+				imaginary = Double.parseDouble(z.substring(0,z.length() - 1));
+				real = 0;
+			}
+			else {
+				real = Double.parseDouble(z);
+				imaginary = 0;
+			}
+		}
+		else {
+			real = Double.parseDouble(z.substring(0,separator));
+			imaginary = Double.parseDouble(z.substring(separator + 1));				
+		}
 	}
 	
 	public Complex(double re)
@@ -57,14 +71,14 @@ public class Complex {
 			else im = fmt.format(imaginary) + 'i';
 		}
 		else im = "0i";
-		if (re.equals("0")) {
-			if (im.equals("0i"))
+		if (re.equals("0") || re.equals("-0")) {
+			if (im.equals("0i") || im.equals("-0i"))
 				return "0";
 			else
 				return im;
 		}
 		else {
-			if (im.equals("0i"))
+			if (im.equals("0i") || im.equals("-0i"))
 				return re;
 			else if (imaginary < 0)
 				return re + im;
