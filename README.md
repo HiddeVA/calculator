@@ -6,5 +6,13 @@ Pressing calculate will calculate whatever you have typed in that field. If it c
 The calculator has a settings tab where you can switch the number format between decimals, complex numbers and roman numerals.
 The calculator can handle almost any calculation for which it has a button.
 
-There is no order of operations; everything is evaluated left-to-right, however you can use brackets to evaluate an expression in the way you want it to.
-Logarithms on complex mode do not work yet, even if the numbers are regular numbers.
+Supported functions:
+Addition/Substraction
+Multiplication/Division
+Parentheses
+Exponentiation
+Pi and e
+Basic trigonometry (sin/cos/tan)
+Roots (including negative roots)
+Logarithms (including negative and base-x logs)
+Complex Exponentiation (not fully tested)
