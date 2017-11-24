@@ -7,12 +7,21 @@ The calculator has a settings tab where you can switch the number format between
 The calculator can handle almost any calculation for which it has a button.
 
 Supported functions:
+
 Addition/Substraction
+
 Multiplication/Division
+
 Parentheses
+
 Exponentiation
+
 Pi and e
+
 Basic trigonometry (sin/cos/tan)
+
 Roots (including negative roots)
+
 Logarithms (including negative and base-x logs)
+
 Complex Exponentiation (not fully tested)
